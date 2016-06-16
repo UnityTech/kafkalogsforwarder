@@ -1,9 +1,9 @@
 package main
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
 	"fmt"
+	"github.com/stretchr/testify/assert"
+	"testing"
 	"time"
 )
 
@@ -23,7 +23,6 @@ func TestNewConsumer(t *testing.T) {
 
 	//c.Start()
 
-
 }
 
 func TestFetchKafkaMetadata(t *testing.T) {
@@ -37,7 +36,6 @@ func TestFetchKafkaMetadata(t *testing.T) {
 	//c.Start()
 }
 
-
 func TestStart(t *testing.T) {
 
 	s := NewConsumer(Brokers, "")
@@ -50,4 +48,3 @@ func TestStart(t *testing.T) {
 
 	//c.Start()
 }
-

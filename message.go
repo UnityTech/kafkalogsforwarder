@@ -7,11 +7,11 @@ import "fmt"
 import "strings"
 
 type Message struct {
-	Key string
-	Topic string
+	Key       string
+	Topic     string
 	Partition int32
-	Offset int64
-	Data []byte
+	Offset    int64
+	Data      []byte
 	Container *gabs.Container
 }
 

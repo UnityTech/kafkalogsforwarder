@@ -1,9 +1,9 @@
 package main
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
 	"fmt"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestElasticsearch(t *testing.T) {
@@ -12,6 +12,7 @@ func TestElasticsearch(t *testing.T) {
 	assert.Nil(t, nil)
 	fmt.Printf("")
 }
+
 /*
 func TestNewElasticsearch(t *testing.T) {
 

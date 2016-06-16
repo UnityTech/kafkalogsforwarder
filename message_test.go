@@ -1,8 +1,8 @@
 package main
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestMessageIsService(t *testing.T) {
@@ -38,7 +38,7 @@ func TestMessageParseJSON(t *testing.T) {
 
 	value, ok := m.Container.Path("service").Data().(string)
 	assert.Equal(t, ok, true)
-	assert.Equal(t, value, "myservice")	
+	assert.Equal(t, value, "myservice")
 }
 
 func TestMessageGetString(t *testing.T) {
@@ -49,7 +49,7 @@ func TestMessageGetString(t *testing.T) {
 
 	value, err := m.GetString("service")
 	assert.Equal(t, err, nil)
-	assert.Equal(t, value, "myservice")	
+	assert.Equal(t, value, "myservice")
 }
 
 func TestMessageGetString2(t *testing.T) {
@@ -60,7 +60,7 @@ func TestMessageGetString2(t *testing.T) {
 
 	value, err := m.GetString("foo", "bar")
 	assert.Equal(t, err, nil)
-	assert.Equal(t, value, "test")	
+	assert.Equal(t, value, "test")
 }
 
 func TestMessageGetString2WithENDL(t *testing.T) {
@@ -71,10 +71,8 @@ func TestMessageGetString2WithENDL(t *testing.T) {
 
 	value, err := m.GetString("foo", "bar")
 	assert.Equal(t, err, nil)
-	assert.Equal(t, value, "test\n")	
+	assert.Equal(t, value, "test\n")
 }
-
-
 
 func TestMessageGetStringWithENDL(t *testing.T) {
 
@@ -84,5 +82,5 @@ func TestMessageGetStringWithENDL(t *testing.T) {
 
 	value, err := m.GetString("msg")
 	assert.Equal(t, err, nil)
-	assert.Equal(t, value, "myservice\n")	
+	assert.Equal(t, value, "myservice\n")
 }
