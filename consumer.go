@@ -4,10 +4,11 @@ import (
 	//    "strconv"
 	"errors"
 	"fmt"
-	"github.com/Shopify/sarama"
-	"github.com/bsm/sarama-cluster"
 	"strings"
 	"sync"
+
+	"github.com/Shopify/sarama"
+	"github.com/bsm/sarama-cluster"
 )
 
 type Consumer struct {

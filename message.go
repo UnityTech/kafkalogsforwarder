@@ -1,10 +1,13 @@
 package main
 
-import "github.com/Jeffail/gabs"
-import "github.com/buger/jsonparser"
-import "bytes"
-import "fmt"
-import "strings"
+import (
+	"bytes"
+	"fmt"
+	"strings"
+
+	"github.com/Jeffail/gabs"
+	"github.com/buger/jsonparser"
+)
 
 type Message struct {
 	Key       string
