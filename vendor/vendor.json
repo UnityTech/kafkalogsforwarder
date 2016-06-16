@@ -1,0 +1,113 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "9mLNJYo5jgm1gAFYqCqsGkaVPqQ=",
+			"path": "github.com/Jeffail/gabs",
+			"revision": "c28ac41b517d24bf381d39d5a294fac6536d81fa",
+			"revisionTime": "2016-05-08T10:46:42Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "jFW5k0x6P23rTpMVqsNB6iAEVxw=",
+			"path": "github.com/Shopify/sarama",
+			"revision": "19422bf56497c7698aff8619a60fb020113080a5",
+			"revisionTime": "2016-06-15T18:36:40Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "SVLb+MXlcD+5jTOLYkT4GuKs9Ow=",
+			"path": "github.com/bsm/sarama-cluster",
+			"revision": "122d1380662642f52d112e7e7e8d2c1e0c12e086",
+			"revisionTime": "2016-05-03T10:32:59Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "L/XDyv2K8AthKNKKAs08dsUVEdg=",
+			"path": "github.com/buger/jsonparser",
+			"revision": "183ade1ac7705adf72585f92410fc0912783217a",
+			"revisionTime": "2016-06-14T16:13:48Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "VSbClFEs4g9QqpvNGmnHnmGbqOc=",
+			"path": "github.com/codegangsta/cli",
+			"revision": "e5bef42c62aa7d25aba4880dc02b7624f01e9e19",
+			"revisionTime": "2016-06-10T15:00:26Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "y2Kh4iPlgCPXSGTCcFpzePYdzzg=",
+			"path": "github.com/eapache/go-resiliency/breaker",
+			"revision": "b86b1ec0dd4209a588dc1285cdd471e73525c0b3",
+			"revisionTime": "2016-01-04T19:15:39Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "WHl96RVZlOOdF4Lb1OOadMpw8ls=",
+			"path": "github.com/eapache/go-xerial-snappy",
+			"revision": "bb955e01b9346ac19dc29eb16586c90ded99a98c",
+			"revisionTime": "2016-06-09T14:24:08Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "AEGF/lRMFJukJAnRqdCVQ/0I+BY=",
+			"path": "github.com/eapache/queue",
+			"revision": "ded5959c0d4e360646dc9e9908cff48666781367",
+			"revisionTime": "2015-06-06T11:53:03Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "Hl3xRJGD+WXOWWmJbH+i9GyaqD0=",
+			"path": "github.com/golang/snappy",
+			"revision": "d9eb7a3d35ec988b8585d4a0068e462c27d28380",
+			"revisionTime": "2016-05-29T05:00:41Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "hX+j017F4PEtIUGflAneDtLC6hs=",
+			"path": "github.com/klauspost/crc32",
+			"revision": "19b0b332c9e4516a6370a0456e6182c3b5036720",
+			"revisionTime": "2016-02-19T14:26:09Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "zKKp5SZ3d3ycKe4EKMNT0BqAWBw=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "8d64eb7173c7753d6419fd4a9caf057398611364",
+			"revisionTime": "2016-05-24T23:42:29Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "Bn333k9lTndxU3D6n/G5c+GMcYY=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "8d64eb7173c7753d6419fd4a9caf057398611364",
+			"revisionTime": "2016-05-24T23:42:29Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "t0aENxSpQgyEQcT2+TllQXZy5Ek=",
+			"path": "gopkg.in/olivere/elastic.v3",
+			"revision": "7a92d18eaf7a9f95d603e70970fb5adcd4dc62f1",
+			"revisionTime": "2016-06-02T11:18:17Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "lLdKOn9RPtFoTtPUNq5+sIInAiE=",
+			"path": "gopkg.in/olivere/elastic.v3/backoff",
+			"revision": "7a92d18eaf7a9f95d603e70970fb5adcd4dc62f1",
+			"revisionTime": "2016-06-02T11:18:17Z",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "XQg6xG6l15Ke43KolthYYnVDCYo=",
+			"path": "gopkg.in/olivere/elastic.v3/uritemplates",
+			"revision": "7a92d18eaf7a9f95d603e70970fb5adcd4dc62f1",
+			"revisionTime": "2016-06-02T11:18:17Z",
+			"tree": true
+		}
+	],
+	"rootPath": "github.com/UnityTech/kafkalogsforwarder"
+}
