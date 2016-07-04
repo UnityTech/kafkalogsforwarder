@@ -25,6 +25,8 @@ func init() {
 				consumer := NewConsumer(globalFlags.Brokers, globalFlags.Groupid)
 				consumer.Init(globalFlags.Topic)
 
+				log.Println(c.String("papertrail"))
+
 				papertrail := make(chan *data, 20)
 				defer close(papertrail)
 				go func(messages <-chan *Message, papertrail chan<- *data) {
@@ -55,18 +57,18 @@ func init() {
 				cli.StringFlag{
 					Name:   "papertrail",
 					Usage:  "The papertrail address where the logs should be forwarded",
-					EnvVar: "PAPERTRAIL",
+					EnvVar: "PAPERTRAIL_ADDRESS",
 				},
 				cli.StringFlag{
 					Name:   "cert",
 					Usage:  "Papertrail root certificate path",
 					Value:  "./papertrail-bundle.pem",
-					EnvVar: "CERT",
+					EnvVar: "PAPERTRAIL_CERT",
 				},
 				cli.StringFlag{
 					Name:   "prefix",
 					Usage:  "String that is prepended to the system name",
-					EnvVar: "PREFIX",
+					EnvVar: "PAPERTRAIL_PREFIX",
 				},
 			},
 		})

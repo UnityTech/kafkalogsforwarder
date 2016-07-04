@@ -16,12 +16,11 @@ var (
 )
 
 var globalFlags = struct {
-	Brokers    []string
-	Topic      []string
-	Partitions string
-	Offset     string
-	Groupid    string
-	Verbose    bool
+	Brokers []string
+	Topic   []string
+	Offset  string
+	Groupid string
+	Verbose bool
 }{}
 
 func main() {
@@ -33,7 +32,7 @@ func main() {
 		cli.StringFlag{
 			Name:   "brokers",
 			Usage:  "The comma separated list of brokers in the Kafka cluster",
-			EnvVar: "LOGTAIL_KAFKA_CONNECTION_STRING",
+			EnvVar: "LOGTAIL_KAFKA_BROKERS",
 		},
 		cli.StringFlag{
 			Name:   "topic",
@@ -41,19 +40,9 @@ func main() {
 			EnvVar: "LOGTAIL_KAFKA_TOPIC",
 		},
 		cli.StringFlag{
-			Name:   "partitions",
-			Usage:  "Comma separated list of partitions. Leave empty to listen all partitions",
-			EnvVar: "PARTITIONS",
-		},
-		cli.StringFlag{
-			Name:   "service",
-			Usage:  "Filter only selected services",
-			EnvVar: "SERVICE",
-		},
-		cli.StringFlag{
 			Name:   "groupid",
 			Usage:  "Consumer group identifier",
-			EnvVar: "GROUPID",
+			EnvVar: "LOGTAIL_KAFKA_GROUPID",
 			Value:  uuid.NewV4().String(),
 		},
 		cli.BoolFlag{
@@ -67,7 +56,6 @@ func main() {
 
 		globalFlags.Brokers = strings.Split(c.String("brokers"), ",")
 		globalFlags.Topic = strings.Split(c.String("topic"), ",")
-		globalFlags.Partitions = c.String("partitions")
 		globalFlags.Offset = c.String("offiset")
 		globalFlags.Groupid = c.String("groupid")
 		globalFlags.Verbose = c.Bool("verbose")
