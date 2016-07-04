@@ -14,7 +14,7 @@ import (
 type Consumer struct {
 	groupID      string
 	seed_brokers []string
-	topic_prefix string
+	topics       []string
 	exitChannel  chan bool
 
 	client *cluster.Client
@@ -42,22 +42,21 @@ func NewKafkaStatus() KafkaStatus {
 	return c
 }
 
-func NewConsumer(brokers []string, topic_prefix, groupid string) Consumer {
+func NewConsumer(brokers, topics []string, groupid string) Consumer {
 
 	c := Consumer{}
 	c.seed_brokers = brokers
+	c.topics = topics
 	c.consumers = make(map[string]*cluster.Consumer)
 
 	c.groupID = groupid
-
-	c.topic_prefix = topic_prefix
 
 	return c
 }
 
 func (s *Consumer) Init() error {
 
-	kafka_status, err := FetchKafkaMetadata(s.seed_brokers, s.topic_prefix)
+	kafka_status, err := FetchKafkaMetadata(s.seed_brokers, s.topics)
 	if err != nil {
 		logger.Fatalf("error fetching metadata from broker: %v", err)
 	}
@@ -78,11 +77,11 @@ func (s *Consumer) Init() error {
 	return nil
 }
 
-func (s *Consumer) StartConsumingTopic(topic ...string) error {
-	consumer, err := cluster.NewConsumerFromClient(s.client, s.groupID, topic)
+func (s *Consumer) StartConsumingTopic() error {
+	consumer, err := cluster.NewConsumerFromClient(s.client, s.groupID, s.topics)
 
 	if err != nil {
-		fmt.Printf("Error on StartConsumingTopic for topic %s: %+v\n", topic, err)
+		fmt.Printf("Error on StartConsumingTopic for topic %s: %+v\n", s.topics, err)
 		return err
 	}
 
@@ -108,7 +107,7 @@ func (s *Consumer) StartConsumingTopic(topic ...string) error {
 		}
 	}(consumer.Messages(), s.Chan)
 
-	fmt.Printf("Started consuming topic %s\n", topic)
+	fmt.Printf("Started consuming topic %s\n", s.topics)
 
 	return nil
 }
@@ -133,7 +132,7 @@ func connectToBroker(config *sarama.Config, seed_brokers []string) (*sarama.Brok
 }
 
 // connects to the broker and fetches current brokers' address and partition ids
-func FetchKafkaMetadata(seed_brokers []string, topic_search_prefix string) (KafkaStatus, error) {
+func FetchKafkaMetadata(seed_brokers, topics []string) (KafkaStatus, error) {
 	kf := NewKafkaStatus()
 
 	config := sarama.NewConfig()
@@ -153,12 +152,11 @@ func FetchKafkaMetadata(seed_brokers []string, topic_search_prefix string) (Kafk
 	}
 
 	for _, broker := range response.Brokers {
-		// log.Printf("broker: %q", broker.Addr())
 		kf.Brokers = append(kf.Brokers, broker.Addr())
 	}
 	fmt.Printf("Brokers: %+v\n", kf.Brokers)
 
-	regexpFilter := regexp.MustCompile(strings.Join(globalFlags.Topic, "|"))
+	regexpFilter := regexp.MustCompile(strings.Join(topics, "|"))
 	for _, topic := range response.Topics {
 		if regexpFilter.MatchString(topic.Name) {
 			kf.Topics = append(kf.Topics, topic.Name)
@@ -169,37 +167,3 @@ func FetchKafkaMetadata(seed_brokers []string, topic_search_prefix string) (Kafk
 	}
 	return kf, broker.Close()
 }
-
-/*
-func ConsumePartition(consumer sarama.Consumer, topic string, partition int32, initialOffset int64, messages chan Message) sarama.PartitionConsumer {
-	var pc sarama.PartitionConsumer
-	pc, err := consumer.ConsumePartition(topic, partition, initialOffset)
-	if err != nil {
-		logger.Fatalln(err)
-	}
-	go func(pc sarama.PartitionConsumer, messages chan Message) {
-		for {
-			select {
-			case err := <-pc.Errors():
-				logger.Printf("Consumer error: %+v", err)
-			case msg := <-pc.Messages():
-				m := Message{}
-				m.Key = string(msg.Key)
-				m.Topic = msg.Topic
-				m.Partition = msg.Partition
-				m.Data = msg.Value
-
-				if err != nil {
-					logger.Printf("Invalid JSON entry in log feed: %s\n", string(msg.Value))
-					continue
-				}
-
-				messages <- m
-			}
-		}
-
-	}(pc, messages)
-
-	return pc
-}
-*/

@@ -15,7 +15,11 @@ func init() {
 			Usage: "tails logs for a single service",
 			Action: func(c *cli.Context) {
 
-				consumer := NewConsumer(globalFlags.Brokers, "", globalFlags.Groupid)
+				if len(c.Args()) > 0 && c.Args()[0] != "" {
+					globalFlags.Topic = strings.Split(c.Args()[0], ",")
+				}
+
+				consumer := NewConsumer(globalFlags.Brokers, globalFlags.Topic, globalFlags.Groupid)
 				consumer.Init()
 
 				go func(messages <-chan *Message) {
@@ -44,7 +48,7 @@ func init() {
 					}
 				}(consumer.Chan)
 
-				consumer.StartConsumingTopic(globalFlags.Topic...)
+				consumer.StartConsumingTopic()
 
 				consumer.Wait()
 			},
