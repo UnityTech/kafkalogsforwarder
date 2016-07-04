@@ -27,6 +27,7 @@ func init() {
 
 				log.Println(c.String("papertrail"))
 
+				go listenforchecks()
 				papertrail := make(chan *data, 20)
 				defer close(papertrail)
 				go func(messages <-chan *Message, papertrail chan<- *data) {

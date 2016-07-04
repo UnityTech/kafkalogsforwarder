@@ -21,6 +21,7 @@ var globalFlags = struct {
 	Offset  string
 	Groupid string
 	Verbose bool
+	Port    string
 }{}
 
 func main() {
@@ -29,6 +30,12 @@ func main() {
 	app.Version = builddate
 
 	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:   "port",
+			Usage:  "Port where the service listens for health check requests",
+			EnvVar: "PORT",
+			Value:  "8080",
+		},
 		cli.StringFlag{
 			Name:   "brokers",
 			Usage:  "The comma separated list of brokers in the Kafka cluster",
@@ -58,6 +65,7 @@ func main() {
 		globalFlags.Topic = strings.Split(c.String("topic"), ",")
 		globalFlags.Offset = c.String("offiset")
 		globalFlags.Groupid = c.String("groupid")
+		globalFlags.Port = c.String("port")
 		globalFlags.Verbose = c.Bool("verbose")
 
 		logger.Printf("Logtail starting with options %+v\n", globalFlags)
