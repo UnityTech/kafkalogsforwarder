@@ -19,8 +19,8 @@ func init() {
 					globalFlags.Topic = strings.Split(c.Args()[0], ",")
 				}
 
-				consumer := NewConsumer(globalFlags.Brokers, globalFlags.Topic, globalFlags.Groupid)
-				consumer.Init()
+				consumer := NewConsumer(globalFlags.Brokers, globalFlags.Groupid)
+				consumer.Init(globalFlags.Topic)
 
 				go func(messages <-chan *Message) {
 					count := 0

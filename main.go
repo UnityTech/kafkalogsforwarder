@@ -56,6 +56,11 @@ func main() {
 			EnvVar: "GROUPID",
 			Value:  uuid.NewV4().String(),
 		},
+		cli.BoolFlag{
+			Name:   "verbose",
+			Usage:  "Use verbose logging",
+			EnvVar: "VERBOSE",
+		},
 	}
 
 	app.Before = func(c *cli.Context) error {
@@ -65,6 +70,7 @@ func main() {
 		globalFlags.Partitions = c.String("partitions")
 		globalFlags.Offset = c.String("offiset")
 		globalFlags.Groupid = c.String("groupid")
+		globalFlags.Verbose = c.Bool("verbose")
 
 		logger.Printf("Logtail starting with options %+v\n", globalFlags)
 

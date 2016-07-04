@@ -42,11 +42,10 @@ func NewKafkaStatus() KafkaStatus {
 	return c
 }
 
-func NewConsumer(brokers, topics []string, groupid string) Consumer {
+func NewConsumer(brokers []string, groupid string) Consumer {
 
 	c := Consumer{}
 	c.seed_brokers = brokers
-	c.topics = topics
 	c.consumers = make(map[string]*cluster.Consumer)
 
 	c.groupID = groupid
@@ -54,9 +53,13 @@ func NewConsumer(brokers, topics []string, groupid string) Consumer {
 	return c
 }
 
-func (s *Consumer) Init() error {
+func (s *Consumer) Init(topics []string) error {
+	var (
+		kafka_status KafkaStatus
+		err          error
+	)
 
-	kafka_status, err := FetchKafkaMetadata(s.seed_brokers, s.topics)
+	kafka_status, s.topics, err = FetchKafkaMetadata(s.seed_brokers, topics)
 	if err != nil {
 		logger.Fatalf("error fetching metadata from broker: %v", err)
 	}
@@ -132,23 +135,24 @@ func connectToBroker(config *sarama.Config, seed_brokers []string) (*sarama.Brok
 }
 
 // connects to the broker and fetches current brokers' address and partition ids
-func FetchKafkaMetadata(seed_brokers, topics []string) (KafkaStatus, error) {
+func FetchKafkaMetadata(seed_brokers, topics []string) (KafkaStatus, []string, error) {
 	kf := NewKafkaStatus()
+	found := []string{}
 
 	config := sarama.NewConfig()
 	broker, err := connectToBroker(config, seed_brokers)
 	if err != nil {
-		return kf, err
+		return kf, nil, err
 	}
 	request := sarama.MetadataRequest{}
 	response, err := broker.GetMetadata(&request)
 	if err != nil {
 		_ = broker.Close()
-		return kf, err
+		return kf, nil, err
 	}
 
 	if len(response.Brokers) == 0 {
-		return kf, errors.New(fmt.Sprintf("Unable to find any brokers"))
+		return kf, nil, errors.New(fmt.Sprintf("Unable to find any brokers"))
 	}
 
 	for _, broker := range response.Brokers {
@@ -159,11 +163,12 @@ func FetchKafkaMetadata(seed_brokers, topics []string) (KafkaStatus, error) {
 	regexpFilter := regexp.MustCompile(strings.Join(topics, "|"))
 	for _, topic := range response.Topics {
 		if regexpFilter.MatchString(topic.Name) {
+			found = append(found, topic.Name)
 			kf.Topics = append(kf.Topics, topic.Name)
 			for _, partition := range topic.Partitions {
 				kf.TopicPartitions[topic.Name] = append(kf.TopicPartitions[topic.Name], partition.ID)
 			}
 		}
 	}
-	return kf, broker.Close()
+	return kf, found, broker.Close()
 }
