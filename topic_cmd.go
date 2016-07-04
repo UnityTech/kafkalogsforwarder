@@ -13,12 +13,12 @@ func init() {
             Usage: "tails a single topic",
             Action: func(c *cli.Context) {
 
-                service := c.Args()[0]
+                topic := c.Args()[0]
 
                 consumer := Consumer{}
                 incomingMessages := make(chan Message)
 
-                go func(messages chan Message, service []byte) {
+                go func(messages chan Message) {
                     for msg := range messages {
 
                         if c.Bool("all") {
@@ -32,9 +32,9 @@ func init() {
                             fmt.Printf("%s %s %s\n", ts, level, msg)
                         }
                     }
-                }(incomingMessages, []byte(service))
+                }(incomingMessages
 
-                consumer.Start(globalFlags.Brokers, service, globalFlags.Partitions, incomingMessages)
+                consumer.Start(globalFlags.Brokers, topic, globalFlags.Partitions, incomingMessages)
 
                 consumer.Wait()
             },
