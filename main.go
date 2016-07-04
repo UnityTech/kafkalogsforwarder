@@ -5,7 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/codegangsta/cli"
+	"github.com/satori/go.uuid"
+	"github.com/urfave/cli"
 )
 
 var (
@@ -16,9 +17,10 @@ var (
 
 var globalFlags = struct {
 	Brokers    []string
-	Topic      string
+	Topic      []string
 	Partitions string
 	Offset     string
+	Groupid    string
 	Verbose    bool
 }{}
 
@@ -48,14 +50,21 @@ func main() {
 			Usage:  "Filter only selected services",
 			EnvVar: "SERVICE",
 		},
+		cli.StringFlag{
+			Name:   "groupid",
+			Usage:  "Consumer group identifier",
+			EnvVar: "GROUPID",
+			Value:  uuid.NewV4().String(),
+		},
 	}
 
 	app.Before = func(c *cli.Context) error {
 
 		globalFlags.Brokers = strings.Split(c.String("brokers"), ",")
-		globalFlags.Topic = c.String("topic")
+		globalFlags.Topic = strings.Split(c.String("topic"), ",")
 		globalFlags.Partitions = c.String("partitions")
 		globalFlags.Offset = c.String("offiset")
+		globalFlags.Groupid = c.String("groupid")
 
 		logger.Printf("Logtail starting with options %+v\n", globalFlags)
 

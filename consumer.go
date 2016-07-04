@@ -1,9 +1,9 @@
 package main
 
 import (
-	//    "strconv"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -22,6 +22,7 @@ type Consumer struct {
 	KafkaStatus KafkaStatus
 	config      *cluster.Config
 
+	Chan           chan *Message
 	consumers      map[string]*cluster.Consumer
 	consumersMutex sync.Mutex
 }
@@ -41,13 +42,13 @@ func NewKafkaStatus() KafkaStatus {
 	return c
 }
 
-func NewConsumer(brokers []string, topic_prefix string) Consumer {
+func NewConsumer(brokers []string, topic_prefix, groupid string) Consumer {
 
 	c := Consumer{}
 	c.seed_brokers = brokers
 	c.consumers = make(map[string]*cluster.Consumer)
 
-	c.groupID = "kafka2elasticsearch"
+	c.groupID = groupid
 
 	c.topic_prefix = topic_prefix
 
@@ -62,6 +63,8 @@ func (s *Consumer) Init() error {
 	}
 	s.KafkaStatus = kafka_status
 
+	s.Chan = make(chan *Message, 256)
+
 	s.config = cluster.NewConfig()
 	s.config.Group.Return.Notifications = true
 
@@ -75,8 +78,8 @@ func (s *Consumer) Init() error {
 	return nil
 }
 
-func (s *Consumer) StartConsumingTopic(topic string) error {
-	consumer, err := cluster.NewConsumerFromClient(s.client, s.groupID, []string{topic})
+func (s *Consumer) StartConsumingTopic(topic ...string) error {
+	consumer, err := cluster.NewConsumerFromClient(s.client, s.groupID, topic)
 
 	if err != nil {
 		fmt.Printf("Error on StartConsumingTopic for topic %s: %+v\n", topic, err)
@@ -84,7 +87,7 @@ func (s *Consumer) StartConsumingTopic(topic string) error {
 	}
 
 	s.consumersMutex.Lock()
-	s.consumers[topic] = consumer
+	//	s.consumers[topic] = consumer
 	defer s.consumersMutex.Unlock()
 
 	go func(notifications <-chan *cluster.Notification) {
@@ -93,11 +96,17 @@ func (s *Consumer) StartConsumingTopic(topic string) error {
 		}
 	}(consumer.Notifications())
 
-	go func(messages <-chan *sarama.ConsumerMessage) {
-		for message := range messages {
-			fmt.Printf("Message: %+v\n", message)
+	go func(in <-chan *sarama.ConsumerMessage, out chan<- *Message) {
+		for message := range in {
+			m := &Message{}
+			m.Key = string(message.Key)
+			m.Topic = message.Topic
+			m.Partition = message.Partition
+			m.Data = message.Value
+
+			out <- m
 		}
-	}(consumer.Messages())
+	}(consumer.Messages(), s.Chan)
 
 	fmt.Printf("Started consuming topic %s\n", topic)
 
@@ -106,38 +115,6 @@ func (s *Consumer) StartConsumingTopic(topic string) error {
 
 func (s *Consumer) Wait() {
 	<-s.exitChannel
-}
-
-func ConsumePartition(consumer sarama.Consumer, topic string, partition int32, initialOffset int64, messages chan Message) sarama.PartitionConsumer {
-	var pc sarama.PartitionConsumer
-	pc, err := consumer.ConsumePartition(topic, partition, initialOffset)
-	if err != nil {
-		logger.Fatalln(err)
-	}
-	go func(pc sarama.PartitionConsumer, messages chan Message) {
-		for {
-			select {
-			case err := <-pc.Errors():
-				logger.Printf("Consumer error: %+v", err)
-			case msg := <-pc.Messages():
-				m := Message{}
-				m.Key = string(msg.Key)
-				m.Topic = msg.Topic
-				m.Partition = msg.Partition
-				m.Data = msg.Value
-
-				if err != nil {
-					logger.Printf("Invalid JSON entry in log feed: %s\n", string(msg.Value))
-					continue
-				}
-
-				messages <- m
-			}
-		}
-
-	}(pc, messages)
-
-	return pc
 }
 
 // connects to one of a list of brokers
@@ -181,8 +158,9 @@ func FetchKafkaMetadata(seed_brokers []string, topic_search_prefix string) (Kafk
 	}
 	fmt.Printf("Brokers: %+v\n", kf.Brokers)
 
+	regexpFilter := regexp.MustCompile(strings.Join(globalFlags.Topic, "|"))
 	for _, topic := range response.Topics {
-		if strings.HasPrefix(topic.Name, topic_search_prefix) {
+		if regexpFilter.MatchString(topic.Name) {
 			kf.Topics = append(kf.Topics, topic.Name)
 			for _, partition := range topic.Partitions {
 				kf.TopicPartitions[topic.Name] = append(kf.TopicPartitions[topic.Name], partition.ID)
@@ -191,3 +169,37 @@ func FetchKafkaMetadata(seed_brokers []string, topic_search_prefix string) (Kafk
 	}
 	return kf, broker.Close()
 }
+
+/*
+func ConsumePartition(consumer sarama.Consumer, topic string, partition int32, initialOffset int64, messages chan Message) sarama.PartitionConsumer {
+	var pc sarama.PartitionConsumer
+	pc, err := consumer.ConsumePartition(topic, partition, initialOffset)
+	if err != nil {
+		logger.Fatalln(err)
+	}
+	go func(pc sarama.PartitionConsumer, messages chan Message) {
+		for {
+			select {
+			case err := <-pc.Errors():
+				logger.Printf("Consumer error: %+v", err)
+			case msg := <-pc.Messages():
+				m := Message{}
+				m.Key = string(msg.Key)
+				m.Topic = msg.Topic
+				m.Partition = msg.Partition
+				m.Data = msg.Value
+
+				if err != nil {
+					logger.Printf("Invalid JSON entry in log feed: %s\n", string(msg.Value))
+					continue
+				}
+
+				messages <- m
+			}
+		}
+
+	}(pc, messages)
+
+	return pc
+}
+*/

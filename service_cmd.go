@@ -1,62 +1,58 @@
 package main
 
 import (
-    "fmt"
-    "github.com/codegangsta/cli"
-    "strings"
-    "os"
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/urfave/cli"
 )
 
 func init() {
-    app.Commands = append(app.Commands,
-        cli.Command{
-            Name:  "service",
-            Usage: "tails logs for a single service",
-            Action: func(c *cli.Context) {
+	app.Commands = append(app.Commands,
+		cli.Command{
+			Name:  "service",
+			Usage: "tails logs for a single service",
+			Action: func(c *cli.Context) {
 
-                service := c.Args()[0]
+				consumer := NewConsumer(globalFlags.Brokers, "", globalFlags.Groupid)
+				consumer.Init()
 
-                consumer := Consumer{}
-                incomingMessages := make(chan Message)
+				go func(messages <-chan *Message) {
+					count := 0
+					for msg := range messages {
 
-                go func(messages chan Message, service []byte) {
-                    count := 0
-                    for msg := range messages {
+						count++
+						if count%100 == 0 {
+							if len(messages) > 100 {
+								fmt.Fprintf(os.Stderr, "Display goroutine is not fast enough: %d\n", len(messages))
+							}
+							fmt.Fprintf(os.Stdout, "%d\r", count)
+						}
 
-                        count++
-                        if count % 100 == 0 {
-                            if len(messages) > 100 {
-                                fmt.Fprintf(os.Stderr, "Display goroutine is not fast enough: %d\n", len(messages))
-                            }
-                            fmt.Fprintf(os.Stdout, "%d\r", count)
-                        }
+						if c.Bool("all") {
+							fmt.Printf("%s\n", msg.Data)
+						} else {
+							msg.ParseJSON()
+							ts, _ := msg.GetString("ts")
+							service, _ := msg.GetString("service")
+							level, _ := msg.GetString("level")
+							msg, _ := msg.GetString("msg")
+							msg = strings.TrimRight(msg, "\n")
+							fmt.Printf("%s: %s %s %s\n", service, ts, level, msg)
+						}
+					}
+				}(consumer.Chan)
 
+				consumer.StartConsumingTopic(globalFlags.Topic...)
 
-                        if msg.IsService(service) {
-                            if c.Bool("all") {
-                                fmt.Printf("%s\n", msg.Data)
-                            } else {
-
-                                msg.ParseJSON()
-                                ts, _ := msg.GetString("ts")
-                                level, _ := msg.GetString("level")
-                                msg, _ := msg.GetString("msg")
-                                msg = strings.TrimRight(msg, "\n")
-                                fmt.Printf("%s %s %s\n", ts, level, msg)
-                            }
-                        }
-                    }
-                }(incomingMessages, []byte(service))
-
-                consumer.Start(globalFlags.Brokers, globalFlags.Topic, globalFlags.Partitions, incomingMessages)
-
-                consumer.Wait()
-            },
-            Flags: []cli.Flag{
-                cli.BoolFlag{
-                    Name:"all",
-                    Usage:"Print entire JSON, not just level and msg fields",
-                },
-            },
-        })
+				consumer.Wait()
+			},
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "all",
+					Usage: "Print entire JSON, not just level and msg fields",
+				},
+			},
+		})
 }
