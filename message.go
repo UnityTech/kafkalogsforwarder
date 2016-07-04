@@ -1,17 +1,20 @@
 package main
 
-import "github.com/Jeffail/gabs"
-import "github.com/buger/jsonparser"
-import "bytes"
-import "fmt"
-import "strings"
+import (
+	"bytes"
+	"fmt"
+	"strings"
+
+	"github.com/Jeffail/gabs"
+	"github.com/buger/jsonparser"
+)
 
 type Message struct {
-	Key string
-	Topic string
+	Key       string
+	Topic     string
 	Partition int32
-	Offset int64
-	Data []byte
+	Offset    int64
+	Data      []byte
 	Container *gabs.Container
 }
 

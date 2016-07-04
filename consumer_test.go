@@ -1,10 +1,11 @@
 package main
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
 	"fmt"
+	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var Brokers = []string{"172.16.6.187:9092"}
@@ -23,7 +24,6 @@ func TestNewConsumer(t *testing.T) {
 
 	//c.Start()
 
-
 }
 
 func TestFetchKafkaMetadata(t *testing.T) {
@@ -37,7 +37,6 @@ func TestFetchKafkaMetadata(t *testing.T) {
 	//c.Start()
 }
 
-
 func TestStart(t *testing.T) {
 
 	s := NewConsumer(Brokers, "")
@@ -50,4 +49,3 @@ func TestStart(t *testing.T) {
 
 	//c.Start()
 }
-
