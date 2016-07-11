@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/urfave/cli"
@@ -42,7 +43,13 @@ func init() {
 							service, _ := msg.GetString("service")
 							level, _ := msg.GetString("level")
 							msg, _ := msg.GetString("msg")
-							msg = strings.TrimRight(msg, "\n")
+
+							// Strings are escaped in kafka, unescape them here if possible:
+							// Note: This does cause bunch of extra overhead. Would be better to do all this using []byte
+							msg2, err := strconv.Unquote("`" + msg + "`")
+							if err == nil {
+								msg = strings.TrimSpace(msg2)
+							}
 							fmt.Printf("%s: %s %s %s\n", service, ts, level, msg)
 						}
 					}

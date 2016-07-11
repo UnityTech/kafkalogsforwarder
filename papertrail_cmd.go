@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -35,7 +36,6 @@ func init() {
 						jsondata := &data{start: time.Now(), offset: msg.Offset}
 						jsondata.Ts, _ = jsonparser.GetUnsafeString(msg.Data, "ts")
 						jsondata.Msg, _ = jsonparser.GetUnsafeString(msg.Data, "msg")
-						jsondata.Msg = strings.TrimRight(jsondata.Msg, `\n`)
 						jsondata.Level, _ = jsonparser.GetUnsafeString(msg.Data, "level")
 						jsondata.Stream, _ = jsonparser.GetUnsafeString(msg.Data, "stream")
 						jsondata.Service, _ = jsonparser.GetUnsafeString(msg.Data, "service")
@@ -45,6 +45,12 @@ func init() {
 						jsondata.DockerImage, _ = jsonparser.GetUnsafeString(msg.Data, "docker_image")
 						jsondata.ContainerName, _ = jsonparser.GetUnsafeString(msg.Data, "container_name")
 						jsondata.ContainerID, _ = jsonparser.GetUnsafeString(msg.Data, "container_id")
+
+						// Strings are escaped in kafka, unescape them here if possible:
+						msg2, err := strconv.Unquote("`" + jsondata.Msg + "`")
+						if err == nil {
+							jsondata.Msg = strings.TrimSpace(msg2)
+						}
 						papertrail <- jsondata
 					}
 				}(consumer.Chan, papertrail)
