@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -35,7 +34,7 @@ func init() {
 					for msg := range messages {
 						jsondata := &data{start: time.Now(), offset: msg.Offset}
 						jsondata.Ts, _ = jsonparser.GetUnsafeString(msg.Data, "ts")
-						jsondata.Msg, _ = jsonparser.GetUnsafeString(msg.Data, "msg")
+						jsondata.Msg, _ = jsonparser.GetString(msg.Data, "msg")
 						jsondata.Level, _ = jsonparser.GetUnsafeString(msg.Data, "level")
 						jsondata.Stream, _ = jsonparser.GetUnsafeString(msg.Data, "stream")
 						jsondata.Service, _ = jsonparser.GetUnsafeString(msg.Data, "service")
@@ -46,11 +45,8 @@ func init() {
 						jsondata.ContainerName, _ = jsonparser.GetUnsafeString(msg.Data, "container_name")
 						jsondata.ContainerID, _ = jsonparser.GetUnsafeString(msg.Data, "container_id")
 
-						// Strings are escaped in kafka, unescape them here if possible:
-						msg2, err := strconv.Unquote("`" + jsondata.Msg + "`")
-						if err == nil {
-							jsondata.Msg = strings.TrimSpace(msg2)
-						}
+						// NOTE: GetString does some allocations, which might cause some overhead.
+						jsondata.Msg = strings.TrimSpace(jsondata.Msg)
 						papertrail <- jsondata
 					}
 				}(consumer.Chan, papertrail)
