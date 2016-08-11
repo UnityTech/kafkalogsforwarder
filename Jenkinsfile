@@ -3,13 +3,16 @@
 node {
     stage 'Test stuff'
 
-    withEnv(["service=foo", "bar=baz"]) {
-        sh "env"
-    }
     withEnv(["service=${env.JOB_NAME.split('/')[0]}", "branch=${env.BRANCH_NAME}"]) {
         sh "env"
     }
+
+    # == null (eli output ei tule automaagisesti stringiksi)
     withEnv(["service=${sh([script: 'echo hello'])}"]) {
+        sh "env"
+    }
+
+    withEnv(["service=${"echo hello".execute().text}"]) {
         sh "env"
     }
 
