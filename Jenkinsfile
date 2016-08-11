@@ -6,6 +6,9 @@ node {
     withEnv(["service=foo", "bar=baz"]) {
         sh "env"
     }
+    withEnv(["service=env.JOB_NAME.split('/')[0]"]) {
+        sh "env"
+    }
     withEnv(["service=sh([script: 'echo $JOB_NAME | cut -d/ -f 1'])"]) {
         sh "env"
     }
