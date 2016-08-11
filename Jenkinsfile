@@ -7,7 +7,7 @@ node {
         sh "env"
     }
 
-    withEnv(["service=${sh([script: 'echo hello'])}"]) {
+    withEnv(["service=${sh([returnStdout: true, script: 'echo hello'])}"]) {
         sh "env"
     }
 
