@@ -63,7 +63,7 @@ func main() {
 
 		globalFlags.Brokers = strings.Split(c.String("brokers"), ",")
 		globalFlags.Topic = strings.Split(c.String("topic"), ",")
-		globalFlags.Offset = c.String("offiset")
+		globalFlags.Offset = c.String("offset")
 		globalFlags.Groupid = c.String("groupid")
 		globalFlags.Port = c.String("port")
 		globalFlags.Verbose = c.Bool("verbose")
