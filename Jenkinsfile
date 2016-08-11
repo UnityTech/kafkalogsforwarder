@@ -7,7 +7,6 @@ node {
         sh "env"
     }
 
-    # == null (eli output ei tule automaagisesti stringiksi)
     withEnv(["service=${sh([script: 'echo hello'])}"]) {
         sh "env"
     }
