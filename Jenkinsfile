@@ -12,7 +12,10 @@ node {
     withEnv(['service=$(echo foo)']) {
         sh "env"
     }
-    withEnv(["service=\$(echo bar)"]) {
+    withEnv(['service=${sh "echo foo"}']) {
+        sh "env"
+    }
+    withEnv(["service=${sh 'echo bar'}"]) {
         sh "env"
     }
 
