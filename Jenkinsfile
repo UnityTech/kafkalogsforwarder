@@ -9,13 +9,7 @@ node {
     withEnv(["service=${env.JOB_NAME.split('/')[0]}", "branch=${env.BRANCH_NAME}"]) {
         sh "env"
     }
-    withEnv(['service=$(echo foo)']) {
-        sh "env"
-    }
-    withEnv(['service=${sh "echo foo"}']) {
-        sh "env"
-    }
-    withEnv(["service=${sh 'echo bar'}"]) {
+    withEnv(["service=${sh([script: 'echo hello'])}"]) {
         sh "env"
     }
 
