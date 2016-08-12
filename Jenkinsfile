@@ -3,11 +3,18 @@
 node {
     stage 'Test stuff'
 
-    withEnv(["service=${env.JOB_NAME.split('/')[0]}", "branch=${env.BRANCH_NAME}"]) {
+    withEnv([
+        "service=${env.JOB_NAME.split('/')[0]}", 
+        "branch=${env.BRANCH_NAME}",
+    ]) {
         sh "env"
     }
 
-    withEnv(["service=${sh([returnStdout: true, script: 'echo hello']).trim()}"]) {
+    withEnv([
+        "service=${env.JOB_NAME.split('/')[0]}",
+        "branch=${env.BRANCH_NAME}",
+        "revision=${sh([returnStdout: true, script: 'git log --format=\"%H\" -n 1']).trim()}",
+    ]) {
         sh "env"
     }
 
