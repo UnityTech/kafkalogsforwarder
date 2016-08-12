@@ -7,6 +7,7 @@ node {
         "service=${env.JOB_NAME.split('/')[0]}",
         "branch=${env.BRANCH_NAME}",
         "revision=${sh([returnStdout: true, script: 'git log --format=\"%H\" -n 1']).trim()}",
+        "docker_image=registry2.applifier.info:5005/$service:$revision",
     ]) {
         sh "env"
     }
