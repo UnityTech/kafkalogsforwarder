@@ -4,18 +4,13 @@ node {
     stage 'Test stuff'
 
     withEnv([
-        "service=${env.JOB_NAME.split('/')[0]}", 
-        "branch=${env.BRANCH_NAME}",
-    ]) {
-        sh "env"
-    }
-
-    withEnv([
         "service=${env.JOB_NAME.split('/')[0]}",
         "branch=${env.BRANCH_NAME}",
         "revision=${sh([returnStdout: true, script: 'git log --format=\"%H\" -n 1']).trim()}",
+        "docker_image=registry2.applifier.info:5005/$service:$revision:env.revision:$env.revision",
     ]) {
         sh "env"
+        echo $docker_image
     }
 
     stage 'Build static binary' 
