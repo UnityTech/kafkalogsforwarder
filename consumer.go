@@ -11,6 +11,8 @@ import (
 	"github.com/bsm/sarama-cluster"
 )
 
+var kafkaversion = sarama.V0_10_1_0
+
 type Consumer struct {
 	groupID      string
 	seed_brokers []string
@@ -94,7 +96,12 @@ func (s *Consumer) StartConsumingTopic() error {
 
 	go func(notifications <-chan *cluster.Notification) {
 		for notification := range notifications {
-			fmt.Printf("Notification: %+v\n", notification)
+			// XXX: see sarama-cluster/consumer.go `subs` variable. rebalane might be throwing errors even though all seems to be working:
+			// kafka server: The provided member is not known in the current generation
+			// kafka server: In the middle of a leadership election, there is currently no leader for this partition and hence it is unavailable for writes.
+			if len(notification.Claimed)+len(notification.Released)+len(notification.Current) > 0 {
+				fmt.Printf("Notification: %+v\n", notification)
+			}
 		}
 	}(consumer.Notifications())
 
@@ -140,6 +147,7 @@ func FetchKafkaMetadata(seed_brokers, topics []string) (KafkaStatus, []string, e
 	found := []string{}
 
 	config := sarama.NewConfig()
+	config.Version = kafkaversion
 	broker, err := connectToBroker(config, seed_brokers)
 	if err != nil {
 		return kf, nil, err
