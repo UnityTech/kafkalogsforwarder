@@ -100,6 +100,40 @@ func Sender(c <-chan *data, address, cert string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	var timechan chan time.Duration
+	if globalFlags.Verbose {
+		timechan = make(chan time.Duration, 10)
+		defer close(timechan)
+		go func(timechan chan time.Duration) {
+			var (
+				eventcount int
+				counter    time.Duration
+				ticker     = time.NewTicker(time.Second * 30)
+			)
+
+		loop:
+			for {
+				select {
+				case duration, ok := <-timechan:
+					if ok {
+						counter += duration
+						eventcount++
+					} else {
+						break loop
+					}
+				case <-ticker.C:
+					if eventcount != 0 {
+						counter = counter / time.Duration(eventcount)
+					}
+					log.Printf("Sent %d messages during the last 30 seconds, averaging %s per message\n", eventcount, counter)
+					eventcount = 0
+					counter = 0
+				}
+			}
+		}(timechan)
+	}
+
 	w.SetFormatter(LogFormatter)
 	for msg := range c {
 		switch msg.Level {
@@ -127,7 +161,7 @@ func Sender(c <-chan *data, address, cert string) {
 			log.Println(err)
 		}
 		if globalFlags.Verbose {
-			log.Printf("Sent %d in %s\n", msg.offset, time.Since(msg.start))
+			timechan <- time.Since(msg.start)
 		}
 	}
 }

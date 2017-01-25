@@ -10,24 +10,24 @@
 			"tree": true
 		},
 		{
-			"checksumSHA1": "mJ2Pw2QAqExIyvP2m54rJNCg5yE=",
+			"checksumSHA1": "5AMwPWTY55PKLuSPGRtZuSgMDsQ=",
 			"path": "github.com/RackSec/srslog",
-			"revision": "259aed10dfa74ea2961eddd1d9847619f6e98837",
-			"revisionTime": "2016-01-20T22:33:50Z",
+			"revision": "c745a1958bd7d989474c39f52f049bf1ed8e49d1",
+			"revisionTime": "2016-10-19T13:57:59Z",
 			"tree": true
 		},
 		{
-			"checksumSHA1": "jFW5k0x6P23rTpMVqsNB6iAEVxw=",
+			"checksumSHA1": "Sxn75Ek6cEuTKUiDQYhaTs6kW1M=",
 			"path": "github.com/Shopify/sarama",
-			"revision": "19422bf56497c7698aff8619a60fb020113080a5",
-			"revisionTime": "2016-06-15T18:36:40Z",
+			"revision": "1548006a8b86e4431c98a96ff029d8c2cfdf7fd3",
+			"revisionTime": "2016-10-18T14:41:24Z",
 			"tree": true
 		},
 		{
-			"checksumSHA1": "SVLb+MXlcD+5jTOLYkT4GuKs9Ow=",
+			"checksumSHA1": "/KA7Q+A2k1QD5YFcBVmeEawnuZA=",
 			"path": "github.com/bsm/sarama-cluster",
-			"revision": "122d1380662642f52d112e7e7e8d2c1e0c12e086",
-			"revisionTime": "2016-05-03T10:32:59Z",
+			"revision": "117d3bb910d11344786e57f50ec3a03b15cca54d",
+			"revisionTime": "2016-10-18T15:28:21Z",
 			"tree": true
 		},
 		{
@@ -130,6 +130,12 @@
 			"tree": true
 		},
 		{
+			"checksumSHA1": "GiX6yRUzizn1C+ckgj1xLFLoz8g=",
+			"path": "github.com/rcrowley/go-metrics",
+			"revision": "ab2277b1c5d15c3cba104e9cbddbdfc622df5ad8",
+			"revisionTime": "2016-09-21T19:52:07Z"
+		},
+		{
 			"checksumSHA1": "1myjT8gKwUI3WNE5a/85jNPL8Fo=",
 			"path": "github.com/satori/go.uuid",
 			"revision": "879c5887cd475cd7864858769793b2ceb0d44feb",
@@ -186,10 +192,10 @@
 			"tree": true
 		},
 		{
-			"checksumSHA1": "+OgOXBoiQ+X+C2dsAeiOHwBIEH0=",
+			"checksumSHA1": "12GqsW8PiRPnezDDy0v4brZrndM=",
 			"path": "gopkg.in/yaml.v2",
-			"revision": "a83829b6f1293c91addabc89d0571c246397bbf4",
-			"revisionTime": "2016-03-01T20:40:22Z",
+			"revision": "a5b47d31c556af34a302ce5d659e6fea44d90de0",
+			"revisionTime": "2016-09-28T15:37:09Z",
 			"tree": true
 		}
 	],
