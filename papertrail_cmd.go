@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -33,17 +33,17 @@ func init() {
 				go func(messages <-chan *Message, papertrail chan<- *data) {
 					for msg := range messages {
 						jsondata := &data{start: time.Now(), offset: msg.Offset}
-						jsondata.Ts, _ = jsonparser.GetUnsafeString(msg.Data, "ts")
+						jsondata.Ts, _ = jsonparser.GetUnsafeString(msg.Data, "time")
 						jsondata.Msg, _ = jsonparser.GetString(msg.Data, "log")
 						jsondata.Level, _ = jsonparser.GetUnsafeString(msg.Data, "level")
 						jsondata.Stream, _ = jsonparser.GetUnsafeString(msg.Data, "stream")
-						jsondata.Service, _ = jsonparser.GetUnsafeString(msg.Data, "service")
-						jsondata.Host, _ = jsonparser.GetUnsafeString(msg.Data, "host")
+						jsondata.Service, _ = jsonparser.GetUnsafeString(msg.Data, "kubernetes", "labels", "app")
+						jsondata.Host, _ = jsonparser.GetUnsafeString(msg.Data, "kubernetes", "host")
 						jsondata.IPAddress, _ = jsonparser.GetUnsafeString(msg.Data, "ip_address")
 						jsondata.ServerIP, _ = jsonparser.GetUnsafeString(msg.Data, "server_ip")
 						jsondata.DockerImage, _ = jsonparser.GetUnsafeString(msg.Data, "docker_image")
-						jsondata.ContainerName, _ = jsonparser.GetUnsafeString(msg.Data, "container_name")
-						jsondata.ContainerID, _ = jsonparser.GetUnsafeString(msg.Data, "container_id")
+						jsondata.ContainerName, _ = jsonparser.GetUnsafeString(msg.Data, "kubernetes", "pod_name")
+						jsondata.ContainerID, _ = jsonparser.GetUnsafeString(msg.Data, "docker", "container_id")
 
 						// NOTE: GetString does some allocations, which might cause some overhead.
 						jsondata.Msg = strings.TrimSpace(jsondata.Msg)
@@ -167,15 +167,8 @@ func Sender(c <-chan *data, address, cert string) {
 }
 
 func (d *data) String() string {
-	repository, tag := parseImage(d.DockerImage)
-	if d.ServerIP == "" {
-		d.ServerIP = d.IPAddress
-	}
-	if tag != "" {
-		return fmt.Sprintf("%s|%s%s|%s@%s|%s", d.Ts, papertrailprefix, repository, tag, d.ServerIP, d.Msg)
-	} else {
-		return fmt.Sprintf("%s|%s%s|%s|%s", d.Ts, papertrailprefix, repository, d.ServerIP, d.Msg)
-	}
+	ts, _ := strconv.ParseInt(d.Ts, 10, 64)
+	return fmt.Sprintf("%s|%s%s|%s|%s", time.Unix(ts, 0).Format(time.RFC3339), papertrailprefix, d.Service, d.ContainerName, d.Msg)
 }
 
 func parseImage(image string) (repository, tag string) {
@@ -202,7 +195,7 @@ func parseImage(image string) (repository, tag string) {
 func LogFormatter(p srslog.Priority, hostname, tag, content string) (msg string) {
 	parts := strings.SplitN(content, "|", 4)
 	if len(parts) == 4 {
-		msg = fmt.Sprintf("<%d> %s %s %s[%d]: %s", p, parts[0], parts[1], parts[2], os.Getpid(), parts[3])
+		msg = fmt.Sprintf("<%d>1 %s %s %s - - - %s", p, parts[0], parts[1], parts[2], parts[3])
 	} else {
 		msg = srslog.DefaultFormatter(p, hostname, tag, content)
 	}
