@@ -168,7 +168,8 @@ func Sender(c <-chan *data, address, cert string) {
 
 func (d *data) String() string {
 	ts, _ := strconv.ParseInt(d.Ts, 10, 64)
-	return fmt.Sprintf("%s|%s%s|%s|%s", time.Unix(ts, 0).Format(time.RFC3339), papertrailprefix, d.Service, d.ContainerName, d.Msg)
+	timestamp := time.Unix(ts, 0).Format(time.RFC3339)
+	return fmt.Sprintf("%s|%s%s|%s|%s %s", timestamp, papertrailprefix, d.Service, d.ContainerName, timestamp, d.Msg)
 }
 
 func parseImage(image string) (repository, tag string) {
@@ -195,7 +196,7 @@ func parseImage(image string) (repository, tag string) {
 func LogFormatter(p srslog.Priority, hostname, tag, content string) (msg string) {
 	parts := strings.SplitN(content, "|", 4)
 	if len(parts) == 4 {
-		msg = fmt.Sprintf("<%d>1 %s %s %s - - - %s %s", p, parts[0], parts[1], parts[2], parts[0], parts[3])
+		msg = fmt.Sprintf("<%d>1 %s %s %s - - - %s", p, parts[0], parts[1], parts[2], parts[3])
 	} else {
 		msg = srslog.DefaultFormatter(p, hostname, tag, content)
 	}
