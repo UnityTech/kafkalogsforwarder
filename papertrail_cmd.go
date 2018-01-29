@@ -35,10 +35,10 @@ func init() {
 						jsondata := &data{start: time.Now(), offset: msg.Offset}
 						jsondata.Ts, _ = jsonparser.GetUnsafeString(msg.Data, "time")
 						jsondata.Msg, _ = jsonparser.GetString(msg.Data, "log")
-						jsondata.Environment, _ = jsonparser.GetUnsafeString(msg.Data, "environment")
 						jsondata.Level, _ = jsonparser.GetUnsafeString(msg.Data, "level")
 						jsondata.Stream, _ = jsonparser.GetUnsafeString(msg.Data, "stream")
 						jsondata.Service, _ = jsonparser.GetUnsafeString(msg.Data, "kubernetes", "labels", "app")
+						jsondata.Environment, _ = jsonparser.GetUnsafeString(msg.Data, "kubernetes", "labels", "environment")
 						jsondata.Host, _ = jsonparser.GetUnsafeString(msg.Data, "kubernetes", "host")
 						jsondata.IPAddress, _ = jsonparser.GetUnsafeString(msg.Data, "ip_address")
 						jsondata.ServerIP, _ = jsonparser.GetUnsafeString(msg.Data, "server_ip")
