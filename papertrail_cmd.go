@@ -35,6 +35,7 @@ func init() {
 						jsondata := &data{start: time.Now(), offset: msg.Offset}
 						jsondata.Ts, _ = jsonparser.GetUnsafeString(msg.Data, "time")
 						jsondata.Msg, _ = jsonparser.GetString(msg.Data, "log")
+						jsondata.Environment, _ = jsonparser.GetUnsafeString(msg.Data, "environment")
 						jsondata.Level, _ = jsonparser.GetUnsafeString(msg.Data, "level")
 						jsondata.Stream, _ = jsonparser.GetUnsafeString(msg.Data, "stream")
 						jsondata.Service, _ = jsonparser.GetUnsafeString(msg.Data, "kubernetes", "labels", "app")
@@ -83,6 +84,7 @@ type data struct {
 	Level         string `json:"level"`
 	Stream        string `json:"stream"`
 	Service       string `json:"service"`
+	Environment   string `json:"environment"`
 	Host          string `json:"host"`
 	IPAddress     string `json:"ip_address"` // legacy
 	ServerIP      string `json:"server_ip"`
@@ -167,9 +169,14 @@ func Sender(c <-chan *data, address, cert string) {
 }
 
 func (d *data) String() string {
+	prefix := papertrailprefix
 	ts, _ := strconv.ParseInt(d.Ts, 10, 64)
 	timestamp := time.Unix(ts, 0).Format(time.RFC3339)
-	return fmt.Sprintf("%s|%s%s|%s|%s %s", timestamp, papertrailprefix, d.Service, d.ContainerName, timestamp, d.Msg)
+	if d.Environment == "stg" {
+		// A bit conflicting with the whole point of shared prefix but mostly a easy solution until some things are sorted.
+		prefix = "staging-"
+	}
+	return fmt.Sprintf("%s|%s%s|%s|%s %s", timestamp, prefix, d.Service, d.ContainerName, timestamp, d.Msg)
 }
 
 func parseImage(image string) (repository, tag string) {
