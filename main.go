@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/satori/go.uuid"
 	"github.com/urfave/cli"
@@ -16,12 +17,13 @@ var (
 )
 
 var globalFlags = struct {
-	Brokers []string
-	Topic   []string
-	Offset  string
-	Groupid string
-	Verbose bool
-	Port    string
+	Brokers  []string
+	Topic    []string
+	Offset   string
+	Groupid  string
+	Verbose  bool
+	Port     string
+	Lifetime time.Duration
 }{}
 
 func main() {
@@ -35,6 +37,12 @@ func main() {
 			Usage:  "Port where the service listens for health check requests",
 			EnvVar: "PORT",
 			Value:  "8080",
+		},
+		cli.DurationFlag{
+			Name:   "lifetime",
+			Usage:  "Mark service unhealthty after this time",
+			EnvVar: "LIFETIME",
+			Value:  0,
 		},
 		cli.StringFlag{
 			Name:   "brokers",
@@ -66,6 +74,7 @@ func main() {
 		globalFlags.Offset = c.String("offset")
 		globalFlags.Groupid = c.String("groupid")
 		globalFlags.Port = c.String("port")
+		globalFlags.Lifetime = c.Duration("lifetime")
 		globalFlags.Verbose = c.Bool("verbose")
 
 		logger.Printf("Logtail starting with options %+v\n", globalFlags)
