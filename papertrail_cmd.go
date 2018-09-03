@@ -34,7 +34,7 @@ func init() {
 					for msg := range messages {
 						jsondata := &data{start: time.Now(), offset: msg.Offset}
 						jsondata.Ts, _ = jsonparser.GetUnsafeString(msg.Data, "time")
-						jsondata.Msg, _ = jsonparser.GetString(msg.Data, "log")
+						jsondata.Msg, _ = jsonparser.GetUnsafeString(msg.Data, "log")
 						jsondata.Level, _ = jsonparser.GetUnsafeString(msg.Data, "level")
 						jsondata.Stream, _ = jsonparser.GetUnsafeString(msg.Data, "stream")
 						jsondata.Service, _ = jsonparser.GetUnsafeString(msg.Data, "kubernetes", "labels", "app")
