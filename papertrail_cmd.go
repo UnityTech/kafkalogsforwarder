@@ -46,6 +46,11 @@ func init() {
 						jsondata.ContainerName, _ = jsonparser.GetUnsafeString(msg.Data, "kubernetes", "pod_name")
 						jsondata.ContainerID, _ = jsonparser.GetUnsafeString(msg.Data, "docker", "container_id")
 
+						// Just send the original data as the message if it for some reason doesn't have anything in the log field.
+						if jsondata.Msg == "" {
+							jsondata.Msg = string(msg.Data)
+						}
+
 						// NOTE: GetString does some allocations, which might cause some overhead.
 						jsondata.Msg = strings.TrimSpace(jsondata.Msg)
 						papertrail <- jsondata
