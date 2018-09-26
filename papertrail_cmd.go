@@ -15,16 +15,19 @@ import (
 var papertrailprefix string
 
 type PapertrailLog struct {
-	Message       string  `json:"message"`
-	Component     string  `json:"component"`
-	Severity      string  `json:"severity"`
-	Action        string  `json:"action"`
-	Subject       string  `json:"subject"`
-	CorrelationId string  `json:"correlation_id"`
-	MessageId     string  `json:"message_id"`
-	Stream        string  `json:"stream"`
-	Time          int64   `json:"time"`
-	DurationS     float64 `json:"duration_s"`
+	Message       string  `json:"message,omitempty"`
+	Component     string  `json:"component,omitempty"`
+	Severity      string  `json:"severity,omitempty"`
+	Action        string  `json:"action,omitempty"`
+	Subject       string  `json:"subject,omitempty"`
+	CorrelationId string  `json:"correlation_id,omitempty"`
+	MessageId     string  `json:"message_id,omitempty"`
+	Name          string  `json:"name,omitempty"`
+	Error         string  `json:"error,omitempty"`
+	Stack         string  `json:"stack,omitempty"`
+	State         string  `json:"state,omitempty"`
+	Time          int64   `json:"time,omitempty"`
+	DurationS     float64 `json:"duration_s,omitempty"`
 }
 
 func init() {
@@ -49,7 +52,6 @@ func init() {
 						jsondata.Ts, _ = jsonparser.GetUnsafeString(msg.Data, "time")
 						jsondata.Msg, _ = jsonparser.GetUnsafeString(msg.Data, "log")
 						jsondata.Level, _ = jsonparser.GetUnsafeString(msg.Data, "level")
-						jsondata.Stream, _ = jsonparser.GetUnsafeString(msg.Data, "stream")
 						jsondata.Service, _ = jsonparser.GetUnsafeString(msg.Data, "kubernetes", "labels", "app")
 						jsondata.Environment, _ = jsonparser.GetUnsafeString(msg.Data, "kubernetes", "labels", "environment")
 						jsondata.Host, _ = jsonparser.GetUnsafeString(msg.Data, "kubernetes", "host")
@@ -69,10 +71,11 @@ func init() {
 							papertrailLog.Subject, _ = jsonparser.GetUnsafeString(msg.Data, "subject")
 							papertrailLog.CorrelationId, _ = jsonparser.GetUnsafeString(msg.Data, "correlation_id")
 							papertrailLog.MessageId, _ = jsonparser.GetUnsafeString(msg.Data, "message_id")
+							papertrailLog.Name, _ = jsonparser.GetUnsafeString(msg.Data, "name")
+							papertrailLog.Error, _ = jsonparser.GetUnsafeString(msg.Data, "error")
+							papertrailLog.Stack, _ = jsonparser.GetUnsafeString(msg.Data, "stack")
 							papertrailLog.DurationS, _ = jsonparser.GetFloat(msg.Data, "duration_s")
 							papertrailLog.Time, _ = jsonparser.GetInt(msg.Data, "time")
-							papertrailLog.Stream, _ = jsonparser.GetUnsafeString(msg.Data, "stream")
-
 							papertraiLogJson, _ := json.Marshal(papertrailLog)
 							jsondata.Msg = string(papertraiLogJson)
 						}
