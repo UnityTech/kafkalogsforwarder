@@ -31,6 +31,8 @@ func main() {
 	app.Usage = "kafkalogs is a tool to tail a kafka stream for json based log entries"
 	app.Version = builddate
 
+	id, _ := uuid.NewV4()
+
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "port",
@@ -58,7 +60,7 @@ func main() {
 			Name:   "groupid",
 			Usage:  "Consumer group identifier",
 			EnvVar: "LOGTAIL_KAFKA_GROUPID",
-			Value:  uuid.NewV4().String(),
+			Value:  id.String(),
 		},
 		cli.BoolFlag{
 			Name:   "verbose",
