@@ -1,18 +1,31 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/RackSec/srslog"
+	"github.com/buger/jsonparser"
+	"github.com/urfave/cli"
 	"log"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/RackSec/srslog"
-	"github.com/buger/jsonparser"
-	"github.com/urfave/cli"
 )
 
 var papertrailprefix string
+
+type PapertrailLog struct {
+	Message       string  `json:"message"`
+	Component     string  `json:"component"`
+	Severity      string  `json:"severity"`
+	Action        string  `json:"action"`
+	Subject       string  `json:"subject"`
+	CorrelationId string  `json:"correlation_id"`
+	MessageId     string  `json:"message_id"`
+	Stream        string  `json:"stream"`
+	Time          int64   `json:"time"`
+	DurationS     float64 `json:"duration_s"`
+}
 
 func init() {
 	app.Commands = append(app.Commands,
@@ -48,11 +61,22 @@ func init() {
 
 						// Just send the original data as the message if it for some reason doesn't have anything in the log field.
 						if jsondata.Msg == "" {
-							jsondata.Msg = string(msg.Data)
+							var papertrailLog PapertrailLog
+							papertrailLog.Message, _ = jsonparser.GetUnsafeString(msg.Data, "message")
+							papertrailLog.Component, _ = jsonparser.GetUnsafeString(msg.Data, "component")
+							papertrailLog.Severity, _ = jsonparser.GetUnsafeString(msg.Data, "severity")
+							papertrailLog.Action, _ = jsonparser.GetUnsafeString(msg.Data, "action")
+							papertrailLog.Subject, _ = jsonparser.GetUnsafeString(msg.Data, "subject")
+							papertrailLog.CorrelationId, _ = jsonparser.GetUnsafeString(msg.Data, "correlation_id")
+							papertrailLog.MessageId, _ = jsonparser.GetUnsafeString(msg.Data, "message_id")
+							papertrailLog.DurationS, _ = jsonparser.GetFloat(msg.Data, "duration_s")
+							papertrailLog.Time, _ = jsonparser.GetInt(msg.Data, "time")
+							papertrailLog.Stream, _ = jsonparser.GetUnsafeString(msg.Data, "stream")
+
+							papertraiLogJson, _ := json.Marshal(papertrailLog)
+							jsondata.Msg = string(papertraiLogJson)
 						}
 
-						// NOTE: GetString does some allocations, which might cause some overhead.
-						jsondata.Msg = strings.TrimSpace(jsondata.Msg)
 						papertrail <- jsondata
 					}
 				}(consumer.Chan, papertrail)
@@ -103,6 +127,12 @@ type data struct {
 
 // Sender receives valid entries from chan 'c' and uploads them into papertrail over an encrypted TCP connection.
 func Sender(c <-chan *data, address, cert string) {
+	if address == "" {
+		for {
+			fmt.Println(<-c)
+		}
+	}
+
 	w, err := srslog.DialWithTLSCertPath("tcp+tls", address, srslog.LOG_INFO, "kafkatopapertrail", cert)
 	if err != nil {
 		log.Fatal(err)
