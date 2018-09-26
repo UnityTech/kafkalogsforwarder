@@ -127,12 +127,6 @@ type data struct {
 
 // Sender receives valid entries from chan 'c' and uploads them into papertrail over an encrypted TCP connection.
 func Sender(c <-chan *data, address, cert string) {
-	if address == "" {
-		for {
-			fmt.Println(<-c)
-		}
-	}
-
 	w, err := srslog.DialWithTLSCertPath("tcp+tls", address, srslog.LOG_INFO, "kafkatopapertrail", cert)
 	if err != nil {
 		log.Fatal(err)
