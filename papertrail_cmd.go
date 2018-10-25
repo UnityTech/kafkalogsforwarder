@@ -24,6 +24,7 @@ type PapertrailLog struct {
 	MessageId     string  `json:"message_id,omitempty"`
 	Name          string  `json:"name,omitempty"`
 	Error         string  `json:"error,omitempty"`
+	Errors        string  `json:"errors,omitempty"`
 	Stack         string  `json:"stack,omitempty"`
 	State         string  `json:"state,omitempty"`
 	Time          int64   `json:"time,omitempty"`
@@ -73,6 +74,7 @@ func init() {
 							papertrailLog.MessageId, _ = jsonparser.GetUnsafeString(msg.Data, "message_id")
 							papertrailLog.Name, _ = jsonparser.GetUnsafeString(msg.Data, "name")
 							papertrailLog.Error, _ = jsonparser.GetUnsafeString(msg.Data, "error")
+							papertrailLog.Errors, _ = jsonparser.GetUnsafeString(msg.Data, "errors")
 							papertrailLog.Stack, _ = jsonparser.GetUnsafeString(msg.Data, "stack")
 							papertrailLog.DurationS, _ = jsonparser.GetFloat(msg.Data, "duration_s")
 							papertrailLog.Time, _ = jsonparser.GetInt(msg.Data, "time")
